@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orgo Tech - Login</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1d3278;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            background-color: #D7EBEB;
+            padding: 20px 0;
+            text-align: center;
+            color: white;
+            margin-top: -70px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1.5px;
+            color: #1b3077;
+        }
+
+        main {
+            background-color: #D7EBEB;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin-top: 170px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #1D2951;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #27ae60;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #1D2951;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #324ecb;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        p a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+
+        p a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            main {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Orgo Tech</h1>
+    </header>
+
+    <main>
+        <section id="login">
+            <h2>Login</h2>
+            <% if(locals.invalid){ %>
+                <h1 style="color:red;">Invalid credentials</h1>
+            <% } %>
+            <form action="/login" method="POST" id="login-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" name="username" id="username" required autofocus>
+                </div>
+            
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password" required>
+                </div>
+            
+                <button type="submit">Login</button>
+            </form>
+
+            <p>Don't have an account? <a href="/register">Register here</a></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Orgo Tech. All rights reserved.</p>
+    </footer>
+</body>
+</html>

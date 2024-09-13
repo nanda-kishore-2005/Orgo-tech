@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orgo Tech - Organic Food</title>
+    <link rel="stylesheet" href="/home.css"> 
+</head>
+<body>
+    <header>
+        <h1>Orgo Tech</h1>
+        <form action="/logout" method="POST" id="logout-form">
+            <button id="logout-button" type="submit">Logout</button>
+        </form>
+        <hr>
+        <!-- Navigation Links -->
+        <nav>
+            <ul>
+                <li><a href="/home">home</a></li>
+                <li><a href="/stores">Stores</a></li>
+                <li><a href="/crops">Crops</a></li>
+                <li><a href="/achievements">Achievements</a></li>   
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <form action="/search" method="GET" id="search-form">
+            <input type="text" name="searchItem" placeholder="Search..." id="search-box">
+            <button type="submit">Search</button>
+        </form>
+
+        <section id="best-selling">
+            <h2>Best Selling</h2>
+            <div class="product-grid">
+                <!-- Example Product 1 -->
+                <div class="product-item">
+                    <img src="https://media.post.rvohealth.io/wp-content/uploads/2020/09/AN313-Tomatoes-732x549-Thumb-732x549.jpg" alt="Tomato">
+                    <h3>Tomato</h3>
+                    <p>Price: ₹20</p>
+                    <a href="/add-to-cart/1" class="add-to-cart-btn">Add to Cart</a>
+                </div>
+                <!-- Example Product 2 -->
+                <div class="product-item">
+                    <img src="https://4.imimg.com/data4/AT/RM/MY-29356566/indian-mangoes.jpg" alt="Mangoes">
+                    <h3>Mangoes</h3>
+                    <p>Price: ₹555</p>
+                    <a href="/add-to-cart/2" class="add-to-cart-btn">Add to Cart</a>
+                </div>
+                <!-- Example Product 3 -->
+                <div class="product-item">
+                    <img src="https://cdn.shopify.com/s/files/1/0058/7779/2832/files/Carrot_Extract.png?v=1653976604" alt="Carrot">
+                    <h3>Carrot</h3>
+                    <p>Price: ₹10</p>
+                    <a href="/add-to-cart/3" class="add-to-cart-btn">Add to Cart</a>
+                </div>
+            </div>
+        </section>
+
+        <h2>Organic Crops across India</h2>
+        <section id="india-map" style="display: flex; flex-wrap: wrap-reverse;">
+            <img src="https://www.24mantra.com/wp-content/uploads/2020/02/Represent-crops-on-India-Map_.jpg" alt="India Crop Map" id="crop-map" style="margin-left: 250px; height: 400px; width: 400px;">
+            <p id="crop-description" style="font-weight: 600;">
+                This map shows the various regions in India where different crops are predominantly grown.<br> Understanding these regions can help in sourcing the freshest and most organic produce directly from the heart of India's agriculture.
+            </p>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Orgo Tech. All rights reserved.</p>
+    </footer>
+</body>
+</html>
