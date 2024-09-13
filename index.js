@@ -4,18 +4,30 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from "pg";
 import session from "express-session";  // Import session module
+import dotenv from 'dotenv';
+
+
+dotenv.config(); // Load environment variables from .env file
+
+// Your existing code
+
 
 let input= [];
 
 
+const { Pool } = pg;
 
-const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "orgo tech",
-    password: "sai123",
-    port: 5432
+const db = new Pool({
+  connectionString: process.env.POSTGRES_URL+"",
 });
+
+// const db = new pg.Client({
+//     user: "postgres",
+//     host: "localhost",
+//     database: "orgo tech",
+//     password: "sai123",
+//     port: 5432
+// });
 db.connect();
 
 const app = express();
@@ -163,8 +175,11 @@ app.get("/search", async (req, res) => {
     }
 });
 
+
 // Add, edit, and delete farmer routes...
 
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
+
+console.log('Postgres URL:', process.env.POSTGRES_URL);
     console.log("Listening on port " + port);
 });
