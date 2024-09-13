@@ -3,20 +3,23 @@ import bodyParser from "body-parser";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from "pg";
-import session from "express-session"; 
+import session from "express-session";
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-let input = [];
-
 const { Pool } = pg;
 
 const db = new Pool({
-  connectionString: process.env.POSTGRES_URL + "",
+  connectionString: process.env.POSTGRES_URL || "",
 });
 
-db.connect();
+// Check if database connection was successful
+db.connect().then(() => {
+  console.log('Connected to database successfully.');
+}).catch(err => {
+  console.error('Error connecting to database:', err.message);
+});
 
 const app = express();
 const port = process.env.PORT || 9999;
@@ -28,10 +31,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'default_secret', // Use a fallback for testing
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true }  
+    cookie: { secure: false }
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -58,7 +61,7 @@ app.get('/achievements', (req, res) => {
 
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
-    
+
     if (username === 'admin' && password === 'password') {
         req.session.isLoggedIn = true;
         req.session.userRole = 'admin';
@@ -75,6 +78,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
+            console.error('Error destroying session:', err.message);
             return res.redirect('/');
         }
         res.clearCookie('connect.sid');
@@ -104,11 +108,11 @@ app.post("/admin/add-farmer", async (req, res) => {
             [name, phone_number, address, farm_location, joining_date, true, bank_details, password, pincode, aadhar_number, photo]
         );
 
-        console.log('New farmer added with ID:', result.rows[0].id); 
-        res.redirect("/admin"); 
+        console.log('New farmer added with ID:', result.rows[0].id);
+        res.redirect("/admin");
     } catch (err) {
-        console.error("Error adding new farmer:", err);
-        res.status(500).send("Failed to add new farmer");
+        console.error("Error adding new farmer:", err.message);
+        res.status(500).send("Failed to add new farmer. Please check the server logs for more details.");
     }
 });
 
@@ -128,31 +132,32 @@ app.get("/home", checkAuth, (req, res) => {
 
 app.get("/admin", checkAuth, async (req, res) => {
     if (req.session.userRole !== 'admin') {
-        return res.redirect("/home");  
+        return res.redirect("/home");
     }
 
     try {
+        console.log("Fetching farmers from database...");
         const result = await db.query("SELECT * FROM farmer");
         const farmers = result.rows;
         res.render("admin.ejs", { farmers });
     } catch (err) {
-        console.error("Error fetching farmers:", err);
-        res.send("An error occurred.");
+        console.error("Error fetching farmers:", err.message);
+        res.send("An error occurred. Check server logs.");
     }
 });
 
 app.get("/search", async (req, res) => {
     const search = req.query.searchItem;
-    console.log(search);
+    console.log("Search term:", search);
 
     try {
         const result = await db.query("SELECT * FROM vegetables WHERE name = $1", [search]);
         const products = result.rows;
-        console.log(products);
+        console.log("Products found:", products);
 
         res.render("buy.ejs", { products });
     } catch (err) {
-        console.log("Error occurred during database query:", err);
+        console.error("Error occurred during database query:", err.message);
         res.redirect("/home");
     }
 });
