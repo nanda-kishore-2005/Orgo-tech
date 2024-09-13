@@ -3,44 +3,35 @@ import bodyParser from "body-parser";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from "pg";
-import session from "express-session";  // Import session module
+import session from "express-session"; 
 import dotenv from 'dotenv';
 
+dotenv.config();
 
-dotenv.config(); // Load environment variables from .env file
-
-// Your existing code
-
-
-let input= [];
-
+let input = [];
 
 const { Pool } = pg;
 
 const db = new Pool({
-  connectionString: process.env.POSTGRES_URL+"",
+  connectionString: process.env.POSTGRES_URL + "",
 });
 
-// const db = new pg.Client({
-//     user: "postgres",
-//     host: "localhost",
-//     database: "orgo tech",
-//     password: "sai123",
-//     port: 5432
-// });
 db.connect();
 
 const app = express();
-const port = 9999;
+const port = process.env.PORT || 9999;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Set up session middleware
+// Set up EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(session({
-    secret: 'yourSecretKey',  // Change this to a strong secret key
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }  // Set secure to true when using HTTPS
+    cookie: { secure: false }  
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -52,6 +43,7 @@ app.get("/", (req, res) => {
 app.get("/login", (req, res) => {
     res.render("login.ejs");
 });
+
 app.get('/stores', (req, res) => {
     res.render('stores.ejs');
 });
@@ -64,16 +56,12 @@ app.get('/achievements', (req, res) => {
     res.render('AandC.ejs');
 });
 
-
-
-
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
     
-    // Example login logic; replace with your DB login logic
     if (username === 'admin' && password === 'password') {
         req.session.isLoggedIn = true;
-        req.session.userRole = 'admin';  // Store the user role
+        req.session.userRole = 'admin';
         res.redirect("/admin");
     } else if (username === 'user' && password === 'password') {
         req.session.isLoggedIn = true;
@@ -93,8 +81,8 @@ app.post("/logout", (req, res) => {
         return res.redirect('/login');
     });
 });
+
 app.post("/admin/add-farmer", async (req, res) => {
-    // Extracting information from the request body
     const {
         name,
         phone_number,
@@ -110,24 +98,20 @@ app.post("/admin/add-farmer", async (req, res) => {
     } = req.body;
 
     try {
-        // Performing the insert operation into the farmer table
         const result = await db.query(
             `INSERT INTO farmer (name, phone_number, address, farm_location, joining_date, status, bank_details, password, pincode, aadhar_number, photo)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
             [name, phone_number, address, farm_location, joining_date, true, bank_details, password, pincode, aadhar_number, photo]
         );
 
-        console.log('New farmer added with ID:', result.rows[0].id); // Output the ID of the newly added farmer
-        res.redirect("/admin"); // Redirect to the admin page or a confirmation page
+        console.log('New farmer added with ID:', result.rows[0].id); 
+        res.redirect("/admin"); 
     } catch (err) {
         console.error("Error adding new farmer:", err);
         res.status(500).send("Failed to add new farmer");
     }
 });
 
-
-
-// Middleware to protect routes
 function checkAuth(req, res, next) {
     if (req.session.isLoggedIn) {
         next();
@@ -138,14 +122,13 @@ function checkAuth(req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Protect the home and admin routes with session check
 app.get("/home", checkAuth, (req, res) => {
     res.render("home.ejs");
 });
 
 app.get("/admin", checkAuth, async (req, res) => {
     if (req.session.userRole !== 'admin') {
-        return res.redirect("/home");  // Prevent users from accessing the admin page
+        return res.redirect("/home");  
     }
 
     try {
@@ -167,7 +150,6 @@ app.get("/search", async (req, res) => {
         const products = result.rows;
         console.log(products);
 
-        // Render the buy.ejs template with the search results
         res.render("buy.ejs", { products });
     } catch (err) {
         console.log("Error occurred during database query:", err);
@@ -175,11 +157,7 @@ app.get("/search", async (req, res) => {
     }
 });
 
-
-// Add, edit, and delete farmer routes...
-
-app.listen(process.env.PORT, () => {
-
-console.log('Postgres URL:', process.env.POSTGRES_URL);
+app.listen(port, () => {
+    console.log('Postgres URL:', process.env.POSTGRES_URL);
     console.log("Listening on port " + port);
 });
