@@ -8,30 +8,28 @@
 </head>
 <body>
     <header>
-        <h1>Orgo Tech</h1>
-        <form action="/logout" method="POST" id="logout-form">
-            <button id="logout-button" type="submit">Logout</button>
-        </form>
-        <hr>
-        <!-- Navigation Links -->
         <nav>
+            <h1>Orgo Tech</h1>
             <ul>
-                <li><a href="/home">home</a></li>
+                <li><a href="/home">Home</a></li>
                 <li><a href="/stores">Stores</a></li>
                 <li><a href="/crops">Crops</a></li>
                 <li><a href="/achievements">Achievements</a></li>   
             </ul>
+            <form action="/logout" method="POST" id="logout-form">
+                <button id="logout-button" type="submit">Logout</button>
+            </form>
         </nav>
     </header>
 
     <main>
         <form action="/search" method="GET" id="search-form">
-            <input type="text" name="searchItem" placeholder="Search..." id="search-box">
+            <input type="text" name="searchItem" placeholder="Search..." id="search-box" autofocus>
             <button type="submit">Search</button>
         </form>
 
         <section id="best-selling">
-            <h2>Best Selling</h2>
+            <h2>Best Selling👇</h2>
             <div class="product-grid">
                 <!-- Example Product 1 -->
                 <div class="product-item">
@@ -54,6 +52,13 @@
                     <p>Price: ₹10</p>
                     <a href="/add-to-cart/3" class="add-to-cart-btn">Add to Cart</a>
                 </div>
+                <div class="product-item">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaZMefppM4pi-ygzOHTbInC84pjJF2bEJWXw&s" alt="Carrot">
+                    <h3>WaterMelon</h3>
+                    <p>Price: ₹78</p>
+                    <a href="/add-to-cart/3" class="add-to-cart-btn">Add to Cart</a>
+                </div>
+               
             </div>
         </section>
 

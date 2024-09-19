@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import pg from "pg";
 import session from "express-session";
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -44,7 +45,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    res.render("login.ejs");
+    res.render("login.ejs", { invalid: false });
 });
 
 app.get('/stores', (req, res) => {
@@ -59,19 +60,80 @@ app.get('/achievements', (req, res) => {
     res.render('AandC.ejs');
 });
 
-app.post("/login", (req, res) => {
+// Update login to handle "admin" username
+
+app.get("/register", (req, res) => {
+    res.render("register.ejs", { error: null });
+});
+
+// Handle registration form submission
+app.post("/register", async (req, res) => {
+    const { cust_name, phone_number, email, password, address, pincode } = req.body;
+
+    try {
+        // Check if user already exists
+        const userExists = await db.query('SELECT * FROM customer WHERE email = $1', [email]);
+        if (userExists.rows.length > 0) {
+            return res.render('register.ejs', { error: 'Email already registered!' });
+        }
+
+
+        // Insert the new customer into the database
+        await db.query(
+            `INSERT INTO customer (cust_name, phone_number, email, password, address, pincode)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [cust_name, phone_number, email, password, address, pincode]
+        );
+
+        // Redirect to login page after successful registration
+        res.redirect('/login');
+    } catch (err) {
+        console.error('Error during registration:', err.message);
+        res.render('register.ejs', { error: 'Registration failed. Please try again.' });
+    }
+});
+app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
-    if (username === 'admin' && password === 'password') {
-        req.session.isLoggedIn = true;
-        req.session.userRole = 'admin';
-        res.redirect("/admin");
-    } else if (username === 'user' && password === 'password') {
-        req.session.isLoggedIn = true;
-        req.session.userRole = 'user';
-        res.redirect("/home");
-    } else {
-        res.render("login.ejs", { invalid: "true" });
+    try {
+        if (username === 'admin') {
+            // Hardcoded admin password check (you can change this for security)
+            if (password === process.env.ADMIN_PASSWORD) {
+                req.session.isLoggedIn = true;
+                req.session.userRole = 'admin';
+                res.redirect("/admin");
+            } else {
+                res.render("login.ejs", { invalid: true });
+            }
+        } else {
+            // Normal customer login
+            const result = await db.query(
+                `SELECT * FROM customer WHERE email = $1`,
+                [username+""]
+            );
+
+            if (result.rows.length > 0) {
+                const user = result.rows[0];
+                console.log(user);
+                // Compare the hashed password
+                const match = password == user.password;
+
+                if (match) {
+                    req.session.isLoggedIn = true;
+                    req.session.userRole = 'customer';
+                    req.session.userId = user.id;
+
+                    res.redirect("/home");
+                } else {
+                    res.render("login.ejs", { invalid: true });
+                }
+            } else {
+                res.render("login.ejs", { invalid: true });
+            }
+        }
+    } catch (err) {
+        console.error("Error during login:", err.message);
+        res.status(500).send("An error occurred during login. Please try again.");
     }
 });
 
@@ -161,6 +223,25 @@ app.get("/search", async (req, res) => {
         res.redirect("/home");
     }
 });
+
+// header.js
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header-placeholder').innerHTML = data;
+            
+            // Adjust title based on page
+            const title = {
+                '/stores': 'Our Stores',
+                '/crops': 'Organic Crops',
+                '/achievements': 'Farmer Achievements & Certifications'
+            }[window.location.pathname] || 'Orgo Tech';
+            
+            document.querySelector('header h1').textContent = title;
+        });
+});
+
 
 app.listen(port, () => {
     console.log('Postgres URL:', process.env.POSTGRES_URL);
