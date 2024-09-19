@@ -96,9 +96,8 @@ app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        if (username === 'admin') {
-            // Hardcoded admin password check (you can change this for security)
-            if (password === process.env.ADMIN_PASSWORD) {
+        if (username == 'admin') {
+            if (password == 'password') {
                 req.session.isLoggedIn = true;
                 req.session.userRole = 'admin';
                 res.redirect("/admin");
