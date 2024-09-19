@@ -224,23 +224,6 @@ app.get("/search", async (req, res) => {
     }
 });
 
-// header.js
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
-            
-            // Adjust title based on page
-            const title = {
-                '/stores': 'Our Stores',
-                '/crops': 'Organic Crops',
-                '/achievements': 'Farmer Achievements & Certifications'
-            }[window.location.pathname] || 'Orgo Tech';
-            
-            document.querySelector('header h1').textContent = title;
-        });
-});
 
 
 app.listen(port, () => {
